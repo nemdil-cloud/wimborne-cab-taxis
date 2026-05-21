@@ -1,0 +1,6 @@
+{
+  "name": "Wimborne Cab Taxis",
+  "description": "Premium landing page for Wimborne Cab Taxis (WCT), providing executive and accessible taxi transfers across Wimborne, Poole, Bournemouth, and greater Dorset.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

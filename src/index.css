@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cinzel", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-gold-50: #fdfaf0;
+  --color-gold-100: #fbf1d1;
+  --color-gold-200: #f5de9f;
+  --color-gold-300: #eec461;
+  --color-gold-400: #e5a42d;
+  --color-gold-500: #d08819;
+  --color-gold-600: #b06912;
+  --color-gold-700: #8b4e10;
+  --color-gold-800: #713e11;
+  --color-gold-900: #5d3311;
+}
+
+/* Custom Utilities for Luxury Golds and Shimmers */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #FCE38A 0%, #F5B942 50%, #C67E14 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #FCE38A 0%, #F5B942 50%, #C67E14 100%);
+}
+
+.border-gold-gradient {
+  border-image: linear-gradient(135deg, #FCE38A, #F5B942, #C67E14) 1;
+}
+
+.shadow-gold-heavy {
+  box-shadow: 0 10px 30px -10px rgba(245, 185, 66, 0.3);
+}
+
+.shadow-gold-soft {
+  box-shadow: 0 0 25px rgba(245, 185, 66, 0.1);
+}
+
+.shadow-gold-glow-hover:hover {
+  box-shadow: 0 0 35px rgba(245, 185, 66, 0.2);
+  transition: all 0.4s ease-in-out;
+}
+
+/* Base resets */
+html, body {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbars but keep functionality if needed */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
