@@ -9,7 +9,6 @@ import { Vehicle, RouteOption, BookingDetails } from '../types';
 interface BookingEngineProps {
   initialTargetDropoff?: string;
 }
-
 export default function BookingEngine({ initialTargetDropoff = '' }: BookingEngineProps) {
   // Wizard Steps: 1 = Route/Date, 2 = Choose Vehicle, 3 = Passenger Details, 4 = Success
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -125,11 +124,44 @@ export default function BookingEngine({ initialTargetDropoff = '' }: BookingEngi
 
     setIsDispatching(true);
     
-    // Simulate API calling
+    // Generate reference immediately so it is available for both email and success screen
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const ref = `WCT-2026-X${randomSuffix}`;
+    setBookingRef(ref);
+
+    // Simulate dispatching delay, then redirect / trigger mailto and show success
     setTimeout(() => {
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      setBookingRef(`WCT-2026-X${randomSuffix}`);
       setIsDispatching(false);
+      
+      const subject = encodeURIComponent(`Booking Request ${ref} - ${passengerName}`);
+      const body = encodeURIComponent(
+        `Wimborne Cab Taxis Dispatch Reservation Request\n` +
+        `==================================================\n\n` +
+        `Booking Reference: ${ref}\n\n` +
+        `--- CUSTOMER DETAILS ---\n` +
+        `Name: ${passengerName}\n` +
+        `Email: ${passengerEmail}\n` +
+        `Phone: ${passengerPhone}\n\n` +
+        `--- JOURNEY DETAILS ---\n` +
+        `Pickup Location: ${getActivePickupName()}\n` +
+        `Destination Address: ${getActiveDropoffName()}\n` +
+        `Date: ${date}\n` +
+        `Time: ${time}\n` +
+        `Estimated Distance: ${distance} Miles\n\n` +
+        `--- VEHICLE & ESTIMATED FARE ---\n` +
+        `Selected Option: ${activeVehicle.name}\n` +
+        `Estimated Fixed Fare: £${totalCost.toFixed(2)}\n` +
+        `Wheelchair WAV Required: ${isWheelchairRequired ? 'YES (Hydraulic Ramp & Winch Match)' : 'No'}\n` +
+        `Contract School Run: ${isSchoolRun ? `YES (School Name: ${schoolName || 'Not specified'})` : 'No'}\n\n` +
+        `--- SPECIAL REQUIREMENTS / LUGGAGE ---\n` +
+        `${specialRequirements || 'None specified.'}\n\n` +
+        `--------------------------------------------------\n` +
+        `Please click "Send" to forward this reservation request to our central dispatch unit.`
+      );
+
+      // Trigger the mailto link action safely
+      window.location.href = `mailto:info@taxi-bournemouth.com?subject=${subject}&body=${body}`;
+
       setStep(4);
       
       // Auto scroll to success ticket
@@ -639,38 +671,50 @@ export default function BookingEngine({ initialTargetDropoff = '' }: BookingEngi
             <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-800/80 text-[10px] text-zinc-500 leading-relaxed flex items-center gap-2">
               <ShieldCheck className="h-6 w-6 text-[#FFE082]" />
               <div>
-                <strong>Zero Booking Risk:</strong> By reserving online, your taxi is secured. No upfront charges. Payment is handled in-vehicle via card or contactless terminal once the journey completes.
+                <strong>Zero Booking Risk:</strong> By reserving online, your taxi is secured. No upfront charges. Payment is handled in-vehicle via card or contactless terminal once the journey completes. For special inquiries, you can directly email <a href="mailto:info@taxi-bournemouth.com" className="text-amber-400 hover:text-[#FFE082] underline font-semibold transition-colors">info@taxi-bournemouth.com</a>.
               </div>
             </div>
 
             {/* Actions Grid */}
-            <div className="flex items-center gap-4 pt-2 border-t border-zinc-900">
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                className="px-4 py-3.5 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 transition flex items-center gap-1.5 cursor-pointer"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Back
-              </button>
+            <div className="flex flex-col gap-3 pt-2 border-t border-zinc-900">
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="px-4 py-3.5 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Back
+                </button>
 
-              <button
-                type="submit"
-                disabled={isDispatching}
-                className="flex-1 py-4 rounded-xl font-bold bg-gold-gradient text-black hover:brightness-110 active:scale-[0.99] transition flex items-center justify-center gap-2 text-base cursor-pointer hover:shadow-gold-heavy disabled:opacity-50"
-              >
-                {isDispatching ? (
-                  <>
-                    <div className="h-5 w-5 rounded-full border-2 border-dashed border-black animate-spin" />
-                    Connecting Dorset Dispatch...
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="h-5 w-5" />
-                    Complete Dispatch Reservation
-                  </>
-                )}
-              </button>
+                <button
+                  type="submit"
+                  disabled={isDispatching}
+                  className="flex-1 py-4 rounded-xl font-bold bg-gold-gradient text-black hover:brightness-110 active:scale-[0.99] transition flex items-center justify-center gap-2 text-base cursor-pointer hover:shadow-gold-heavy disabled:opacity-50"
+                >
+                  {isDispatching ? (
+                    <>
+                      <div className="h-5 w-5 rounded-full border-2 border-dashed border-black animate-spin" />
+                      Connecting Dorset Dispatch...
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="h-5 w-5" />
+                      Complete Dispatch Reservation
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <p className="text-center text-xs text-zinc-400 mt-1">
+                Prefer manual dispatch? You can also complete your reservation request by emailing{' '}
+                <a 
+                  href="mailto:info@taxi-bournemouth.com?subject=Wimborne Cab Taxis - New Dispatch Reservation Request"
+                  className="text-[#FFE082] hover:text-amber-400 underline font-semibold transition-colors"
+                >
+                  info@taxi-bournemouth.com
+                </a>
+              </p>
             </div>
           </form>
         )}
